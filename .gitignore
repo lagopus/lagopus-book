@@ -1,0 +1,5 @@
+*/build/
+*.pyc
+*/source/images/*/*.eps
+# */source/images/*/*.png
+ 
