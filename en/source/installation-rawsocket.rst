@@ -1,4 +1,4 @@
-:lagopus-version: 0.2.6
+:lagopus-version: 0.2.10
 
 .. _ref_installation-rawsocket:
 
@@ -13,10 +13,10 @@ If you want to enable "DPDK" for performance and scalability, please refer to :r
 
 Required software versions
 --------------------------------
-* Lagopus: `Lagopus software switch 0.2.6`_
+* Lagopus: `Lagopus software switch 0.2.10`_
 * Linux distribution: `Ubuntu Server 16.04 LTS`_
 
-.. _Lagopus software switch 0.2.6: https://github.com/lagopus/lagopus/releases/tag/v0.2.6
+.. _Lagopus software switch 0.2.10: https://github.com/lagopus/lagopus/releases/tag/v0.2.10
 .. _Ubuntu Server 16.04 LTS: http://www.ubuntu.com/download/server
 
 
@@ -38,17 +38,17 @@ Lagopus installation steps
 
   .. code-block:: console
 
-     $ wget https://github.com/lagopus/lagopus/archive/v0.2.6.tar.gz
-     $ tar xvf v0.2.6.tar.gz
+     $ wget https://github.com/lagopus/lagopus/archive/v0.2.10.tar.gz
+     $ tar xvf v0.2.10.tar.gz
      $ ls
-     lagopus-0.2.6  v0.2.6.tar.gz
+     lagopus-0.2.10  v0.2.10.tar.gz
      $
 
   or
 
   .. code-block:: console
 
-     $ git clone --depth=1 -b v0.2.6 https://github.com/lagopus/lagopus.git
+     $ git clone --depth=1 -b v0.2.10 https://github.com/lagopus/lagopus.git
      $ ls
      lagopus
      $
@@ -58,7 +58,7 @@ Lagopus installation steps
 
   .. code-block:: console
 
-     $ cd lagopus-0.2.6
+     $ cd lagopus-0.2.10
      $ ./configure --disable-dpdk
      $ make
 
@@ -79,7 +79,7 @@ Example Lagopus configuration (DSL format) can be found at "misc/examples/lagopu
   .. code-block:: console
 
      $ sudo mkdir /usr/local/etc/lagopus/
-     $ cd ~/lagopus-0.2.6
+     $ cd ~/lagopus-0.2.10
      $ sudo cp misc/examples/lagopus.dsl /usr/local/etc/lagopus/lagopus.dsl
 
 * Edit configuration file suited to your environment.
@@ -122,7 +122,7 @@ Enter ``stop`` command from lagosh to stop Lagopus software switch.
   Lagosh> show version
   {
       "product-name": "Lagopus",
-      "version": "0.2.6-release"
+      "version": "0.2.10-release"
   }
   Lagosh> stop
   Lagosh> show version

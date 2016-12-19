@@ -7,12 +7,12 @@ This section describes how to install Lagopus on VirtualBox VM.
 
 Software Versions
 -----------------
-* Lagopus software switch: `Lagopus software switch 0.2.6`_
+* Lagopus software switch: `Lagopus software switch 0.2.10`_
 * VirtualBox: 5.0.14r105127
 * Host OS: Windows 10
 * Guest OS: Linux `Ubuntu Server 16.04 LTS`_
 
-.. _Lagopus software switch 0.2.6: https://github.com/lagopus/lagopus/releases/tag/v0.2.6
+.. _Lagopus software switch 0.2.10: https://github.com/lagopus/lagopus/releases/tag/v0.2.10
 .. _Ubuntu Server 16.04 LTS: http://www.ubuntu.com/download/server
 
 About VirtualBox

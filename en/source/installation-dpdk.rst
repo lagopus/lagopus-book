@@ -32,7 +32,7 @@ Lagopus software switch with DPDK configuration uses multiple CPU cores to achie
 Software Versions
 -----------------
 
-* Lagopus : `Lagopus software switch 0.2.6 <https://github.com/lagopus/lagopus/releases/tag/v0.2.6>`_
+* Lagopus : `Lagopus software switch 0.2.10 <https://github.com/lagopus/lagopus/releases/tag/v0.2.10>`_
 * OS: `Ubuntu Server 16.04 LTS <http://www.ubuntu.com/download/server>`_
 * DPDK: 2.2 or above
 
@@ -57,17 +57,17 @@ Installation steps
 
   .. code-block:: console
 
-    $ wget https://github.com/lagopus/lagopus/archive/v0.2.6.tar.gz
-    $ tar xvf v0.2.6.tar.gz
+    $ wget https://github.com/lagopus/lagopus/archive/v0.2.10.tar.gz
+    $ tar xvf v0.2.10.tar.gz
     $ ls
-    lagopus-0.2.6  v0.2.6.tar.gz
+    lagopus-0.2.10  v0.2.10.tar.gz
     $
 
   Or
 
   .. code-block:: console
 
-    $ git clone -b v0.2.6 --recursive https://github.com/lagopus/lagopus.git
+    $ git clone -b v0.2.10 --recursive https://github.com/lagopus/lagopus.git
     $ ls
     lagopus
     $
@@ -88,7 +88,7 @@ Installation steps
 
      .. code-block:: console
 
-         /home/<usr>/lagopus-0.2.6/mk/make_dpdk.sh /home/<usr>/lagopus-0.2.6 src/dpdk \
+         /home/<usr>/lagopus-0.2.10/mk/make_dpdk.sh /home/<usr>/lagopus-0.2.10 src/dpdk \
                      "x86_64" "linuxapp" gcc
          fatal: Not a git repository (or any of the parent directories): .git
          make[1]: *** [dpdk] Error 1
@@ -208,14 +208,14 @@ Perform the following steps to enable NICs for DPDK application.
 
 
 
-* Check PCI ID of the NICs you want to use for DPDK with ``dpdk_nic_bind.py`` script.
+* Check PCI ID of the NICs you want to use for DPDK with ``dpdk-devbind.py`` script.
 
-  ``dpdk_nic_bind.py`` script displays DPDK-enabled NIC information, such as PCI ID and interface name in Linux kernel.
+  ``dpdk-devbind.py`` script displays DPDK-enabled NIC information, such as PCI ID and interface name in Linux kernel.
 
   .. code-block:: console
 
      $ cd lagopus
-     $ sudo ./src/dpdk/tools/dpdk_nic_bind.py --status
+     $ sudo ./src/dpdk/tools/dpdk-devbind.py --status
 
      Network devices using DPDK-compatible driver
      ============================================
@@ -254,12 +254,12 @@ Perform the following steps to enable NICs for DPDK application.
 
 * Unbound NICs from ixgbe driver and registerd with igb_uio driver.
 
-   Perform the dpdk_nic_bind with the PCI IDs to be unbounded from Linux kernel.
+   Perform the dpdk-devbind with the PCI IDs to be unbounded from Linux kernel.
 
    .. code-block:: console
 
-       ~/lagopus$ sudo ./src/dpdk/tools/dpdk_nic_bind.py --bind=igb_uio 0000:00:08.0 0000:00:09.0
-       ~/lagopus$ sudo ./src/dpdk/tools/dpdk_nic_bind.py --status
+       ~/lagopus$ sudo ./src/dpdk/tools/dpdk-devbind.py --bind=igb_uio 0000:00:08.0 0000:00:09.0
+       ~/lagopus$ sudo ./src/dpdk/tools/dpdk-devbind.py --status
 
        Network devices using DPDK-compatible driver
        ============================================
@@ -314,7 +314,7 @@ Example Lagopus configuration (DSL format) can be found at "misc/examples/lagopu
   .. code-block:: console
 
      $ sudo mkdir /usr/local/etc/lagopus/
-     $ cd ~/lagopus-0.2.6
+     $ cd ~/lagopus-0.2.10
      $ sudo cp misc/examples/lagopus.dsl /usr/local/etc/lagopus/lagopus.dsl
 
 * Edit configuration file suited to your environment.
@@ -413,7 +413,7 @@ Operation of Lagopus software switch with ``lagosh``
      Lagosh> show version
      {
          "product-name": "Lagopus",
-         "version": "0.2.6-release"
+         "version": "0.2.10-release"
      }
      Lagosh> stop
      Lagosh> show version

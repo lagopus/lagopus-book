@@ -9,10 +9,10 @@ This section describes how to configure Lagopus software switch as Layer 2 switc
 
 Software Versions
 -----------------
-* Lagopus software switch: `Lagopus software switch 0.2.6`_
+* Lagopus software switch: `Lagopus software switch 0.2.10`_
 * OS: Linux `Ubuntu Server 14.04.3 LTS`_
 
-.. _Lagopus software switch 0.2.6: https://github.com/lagopus/lagopus/releases/tag/v0.2.6
+.. _Lagopus software switch 0.2.10: https://github.com/lagopus/lagopus/releases/tag/v0.2.10
 .. _Ubuntu Server 14.04.3 LTS: http://www.ubuntu.com/download/server
 
 Overall toplogy and client host setup

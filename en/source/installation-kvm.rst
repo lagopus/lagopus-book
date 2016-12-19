@@ -11,10 +11,10 @@ This section describes:
 
 Software Versions
 -----------------
-* Lagopus software switch: `Lagopus software switch 0.2.6`_
+* Lagopus software switch: `Lagopus software switch 0.2.10`_
 * OS: Linux `Ubuntu Server 14.04.3 LTS`_
 
-.. _Lagopus software switch 0.2.6: https://github.com/lagopus/lagopus/releases/tag/v0.2.6
+.. _Lagopus software switch 0.2.10: https://github.com/lagopus/lagopus/releases/tag/v0.2.10
 .. _Ubuntu Server 14.04.3 LTS: http://www.ubuntu.com/download/server
 
 Overall topology and client host setup
@@ -392,7 +392,7 @@ Installing Lagopus to VM (raw socket)
 
   .. code-block:: console
 
-     lagopus-kvm:~$ git clone -b v0.2.6 --recursive https://github.com/lagopus/lagopus.git
+     lagopus-kvm:~$ git clone -b v0.2.10 --recursive https://github.com/lagopus/lagopus.git
 
 * Compile and install Lagopus software switch with raw-socket mode
 
