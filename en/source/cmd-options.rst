@@ -84,11 +84,11 @@ Common option
 
 * ``--fifoness TYPE`` :
 
-  * Select packet ordering (FIFOness) mode [default: none]
+  * Select packet ordering (FIFOness) mode [default: flow]
   * ``none`` : FIFOness is disabled
   * ``port`` : FIFOness per each port.
   * ``flow`` : FIFOness per each flow.
-  * Example: ``--fifoness flow``
+  * Example: ``--fifoness none``
 
 	* Specify flow-level FIFOness
 
