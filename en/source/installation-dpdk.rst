@@ -346,7 +346,7 @@ Running / Stopping Lagopus software switch
 DPDK command option
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-In order to run Lagopus softwarwe switch with DPDK configuration, you need to specify DPDK-related options in ``lagopus`` command: which CPU cores are assigned to packet processing (``-c``), how many memory channels the host has (``-n``), which DPDK ports are used (``-p``).
+In order to run Lagopus softwarwe switch with DPDK configuration, you need to specify DPDK-related options in ``lagopus`` command: which CPU cores are assigned to packet processing (``-c``), how many memory channels the host has (``-n``).
 
 In this example, the host has four CPU cores and two memory channel and you try to assign CPU core #1 and CPU core #0 for network I/O and processing and DPDK port #0 and DPDK port #1.
 With ``-c`` option, you should specify which CPU cores are assigned to Lagopus software switch. The value of ``-c`` option uses the hexadecimal notation that its *N* -bit shows whehter CPU core # *N* is used or not for DPDK. The following table help your understanding of CPU flags.
@@ -368,21 +368,6 @@ With ``-c`` option, you should specify which CPU cores are assigned to Lagopus s
      - 0x3
 
 
-With ``-p`` option, you should specify which DPDK ports are assigned to Lagopus software switch. The value of ``-p`` option also uses the hexadecimal notation that its *N* -bit shows whehter DPDK port # *N* is used or not for DPDK.
-
-.. list-table:: DPDK NIC flag
-   :header-rows: 1
-
-   * - DPDK port # 1
-     - DPDK port # 2
-     - flag in binary
-     - flag in hexadecimal
-   * - 1
-     - 1
-     - 0x11
-     - 0x3
-
-
 
 Run Lagopus software switch
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -391,7 +376,7 @@ Run Lagopus software switch
 
   .. code-block:: console
 
-     $ sudo lagopus -d -- -c3 -n2 -- -p3
+     $ sudo lagopus -d -- -c3 -n2 --
 
 Or
 
@@ -399,7 +384,7 @@ Or
 
   .. code-block:: console
 
-     $ sudo lagopus -- -c3 -n2 -- -p3
+     $ sudo lagopus -- -c3 -n2 --
 
 
 Operation of Lagopus software switch with ``lagosh``
