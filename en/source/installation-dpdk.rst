@@ -332,7 +332,7 @@ Example Lagopus configuration (DSL format) can be found at "misc/examples/lagopu
        channel channel01 create -dst-addr 127.0.0.1 -protocol tcp
        controller controller01 create -channel channel01 -role equal -connection-type main
        interface interface01 create -type ethernet-dpdk-phy -port-number 0
-       interface interface02 create -type ethernet-dpdk-phy -port-number 1
+       interface interface02 create -type ethernet-dpdk-phy -device :0000:00:09.0 # Since v0.2.10, interface can be specified by PCI ID.
        port port01 create -interface interface01
        port port02 create -interface interface02
        bridge bridge01 create -controller controller01 -port port01 1 -port port02 2 -dpid 0x1
