@@ -48,7 +48,7 @@ Installation steps
     $ sudo apt-get update
     $ sudo apt-get install build-essential linux-headers-$(uname -r) \
       libexpat-dev libgmp-dev \
-      libssl-dev libpcap-dev byacc flex git \
+      libssl-dev libpcap-dev libnuma-dev byacc flex git \
       python-dev python-pastedeploy python-paste python-twisted
 
 
