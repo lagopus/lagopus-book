@@ -1,433 +1,205 @@
-.. -*- coding: utf-8; -*-
-
 .. _ref_installation-dpdk:
 
-Installation with DPDK
-===============================
+How to install DPDK for Lagopus software router
+===============================================
 
-This section describes how to install DPDK-enabled Lagopus.
+This section describes how to install DPDK [#]_ for Lagopus software router.
 
-.. [#] For detail DPDK information, check http://dpdk.org/
+.. [#] For more information about DPDK, check http://dpdk.org/
 
 Minimum hardware requirement
----------------------------------
+----------------------------
 
-Lagopus software router with DPDK configuration uses multiple CPU cores to achieve high-performance network I/O and processing performance. Therefore, you have to prepare a host machine that meets the following minimum hardware requirements.
+Lagopus software router requires DPDK which uses multiple CPU cores to achieve high-performance network I/O and processing performance. Therefore, you have to prepare a host machine that meets the following minimum hardware requirements.
 
-- # of CPU cores: **4 or more**
-- Memory size: **4 GB or more**
-- NIC: DPDK-enabled NICs
-
-.. warning::
-   **You need 4 or more processors (CPU cores) to run Lagopus software router using DPDK**.
-
+* # of CPU cores: **4 or more**
+* Memory size: **4 GB or more**
+* NIC: DPDK-enabled NICs
 
 
 Software Versions
 -----------------
 
-* Lagopus : `Lagopus software router 0.x.y <TODO>`_
 * OS: `Ubuntu Server 18.04 LTS <http://www.ubuntu.com/download/server>`_
-* DPDK: x.y
+* DPDK: 17.11.1 (LTS)
 
 
 Installation steps
---------------------------
+------------------
 
-* Install Ubuntu to a bear-metal server or a VM.
+Lagopus software router requires to build DPDK in shared lib mode.
+Follow below steps to install DPDK in shared lib mode.
+
+* Install Ubuntu Server.
+
+  * Refer to :ref:`ref_virtualbox` for step to install Ubuntu Server on Oracle VM VirtualBox.
+
+* Download and extract DPDK source code
+
+  * http://dpdk.org/download
+
+  .. code-block:: none
+
+   $ wget http://fast.dpdk.org/rel/dpdk-17.11.1.tar.xz
+   $ tar xvf dpdk-17.11.1.tar.xz
+
 * Install necessary packages.
 
-  .. code-block:: console
+  .. code-block:: none
 
-    $ sudo apt-get update
-    $ sudo apt-get install build-essential linux-headers-$(uname -r) \
-      libexpat-dev libgmp-dev \
-      libssl-dev libpcap-dev byacc flex git \
-      python-dev python-pastedeploy python-paste python-twisted
+   $ sudo apt update
+   $ sudo apt install gcc make python libnuma-dev libelf-dev
 
+* Modify config file to enable CONFIG_RTE_BUILD_SHARED_LIB
 
-* Download Lagopus source code.
+  .. code-block:: none
 
-  You have two options to get Lagopus source code by downloading tar file or by ``git``.
+   $ cd dpdk-stable-17.11.1
+   ~/dpdk-stable-17.11.1$ cp config/common_base config/common_base.original
+   ~/dpdk-stable-17.11.1$ vi config/common_base
+   < CONFIG_RTE_BUILD_SHARED_LIB=n
+   ---
+   > CONFIG_RTE_BUILD_SHARED_LIB=y
 
-  .. code-block:: console
+* Build and install DPDK
 
-    $ wget https://github.com/lagopus/lagopus/archive/v0.2.10.tar.gz
-    $ tar xvf v0.2.10.tar.gz
-    $ ls
-    lagopus-0.2.10  v0.2.10.tar.gz
-    $
+  .. code-block:: none
 
-  Or
+   ~/dpdk-stable-17.11.1$ make T=x86_64-native-linuxapp-gcc config
+   ~/dpdk-stable-17.11.1$ make
+   ~/dpdk-stable-17.11.1$ sudo make install
 
-  .. code-block:: console
-
-    $ git clone -b v0.2.10 --recursive https://github.com/lagopus/lagopus.git
-    $ ls
-    lagopus
-    $
-
-* Compile DPDK-enabled Lagopus software router
-
-  The source code of DPDK library is automatically download by git submodule mechanism. You don't have to download by manual.
-
-  .. code-block:: console
-
-     $ ./configure
-     $ make
-
-
-  .. note::
-
-     If you find an error in configure process or make process, check git submodule setting. Sometimes git submodule operation may be failed due to firewall or proxy setting on your environment.
-
-     .. code-block:: console
-
-         /home/<usr>/lagopus-0.2.10/mk/make_dpdk.sh /home/<usr>/lagopus-0.2.10 src/dpdk \
-                     "x86_64" "linuxapp" gcc
-         fatal: Not a git repository (or any of the parent directories): .git
-         make[1]: *** [dpdk] Error 1
-         make[1]: Leaving directory `/home/<usr>/lagopus-0.2.3'
-         make: *** [prerequisite] Error 2
-         configure: error: Prerequisite failure.
-
-* Install lagopus package
-
-  .. code-block:: console
-
-     $ sudo make install
 
 Setup DPDK
-----------------------
+----------
 
-To enable DPDK on your environment, you have three steps, kernel module setup, hugepage setup, DPDK-enabled NIC assignment.
-The above compilation process of Lagopus software router , DPDK library and drivers are compiled automatically. Thus you just perform the following DPDK configurations.
+To enable DPDK on your environment, you have to enable hugepage.
 
-
-Setup kernel module
-^^^^^^^^^^^^^^^^^^^
-
-DPDK provides two kernel modules, ``igb_uio`` and ``rte_kni``, to realize userspace NIC drivers and network packet processsing. The ``igb_uio`` is a wrapper module for DPDK-enabled NICs on top of UIO_ module of Linux kernel. The ``igb_uio`` allows userspace DPDK driver access to memory-mapped registers on NICs directly.
-The ``rte_kni`` module enables packet frame exchanges between an user space DPDK application and network stack in kernel space.
-
-.. _UIO: https://www.kernel.org/doc/htmldocs/uio-howto/about.html
-
-* Load UIO and kernel modules.
-
-  The kernel modules built are available in the ``src/dpdk/build/kmod`` directory.
-
-    .. code-block:: console
-
-       $ sudo modprobe uio
-       $ cd lagopus
-       $ sudo insmod ./src/dpdk/build/kmod/igb_uio.ko
-       $ sudo insmod ./src/dpdk/build/kmod/rte_kni.ko
-       $ lsmod | egrep 'uio|kni'
-       rte_kni               282624  0
-       igb_uio                16384  0
-       uio                    20480  1 igb_uio
-       $
-
-    .. note::
-
-       You have to perform the above steps above after the OS reboot.
-
-Setup Hugepages
-^^^^^^^^^^^^^^^^^^^^
+* Setup Hugepages
 
 Make hugepages available to DPDK. You can setup hugepage in two ways:
 
 1. Manual configuration: Repeate steps after reboot if you select this.
 2. Script configuration: Select this to keep it permanent after reboot.
 
-.. note::
+  .. note::
 
-   When configured manually with , you need the same steps after rebooting OS.
+   When configured manually, you need to repeat the same steps after rebooting OS.
 
 
 1. Manual confguration (undone after reboot)
 
    Perform the following commands
 
-   .. code-block:: console
+   .. code-block:: none
 
-      $ sudo sh -c "echo 256 >  /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages"
+      $ sudo sh -c "echo 1024 >  /sys/devices/system/node/node0/hugepages/hugepages-2048kB/nr_hugepages"
       $ sudo mkdir -p /mnt/huge
       $ sudo mount -t hugetlbfs nodev /mnt/huge
 
 2. Script configuration (permanent after reboot)
 
-   * Reserve 256 pages of 2 MB hugepages in linux by adding the following line in  ``/etc/sysctl.conf``.
+   * Reserve 1024 pages of 2 MB hugepages in linux by adding the following line in  ``/etc/sysctl.conf``.
 
-     .. code-block:: console
+     .. code-block:: none
 
         $ sudo vi /etc/sysctl.conf
-        vm.nr_hugepages = 256
-        $
+        vm.nr_hugepages = 1024
 
-   * Enable permanent across reboots. Add a directory for hugepages and the following line to ``/etc/fstab`` so that mount point can be made permanent across reboots.
+   * Add a directory for hugepages and the following line to ``/etc/fstab`` so that mount point can be made permanent across reboots.
 
-     .. code-block:: console
+     .. code-block:: none
 
         $ sudo mkdir -p /mnt/huge
         $ sudo vi /etc/fstab
         nodev /mnt/huge hugetlbfs defaults 0 0
 
+   * Reboot
+
+     .. code-block:: none
+
+        $ sudo reboot
+
    * Confirm HugePages are configured correctly by the below commands.
 
-     .. code-block:: console
+     .. code-block:: none
 
         $ grep -i "HugePages" /proc/meminfo
         AnonHugePages:         0 kB
-        HugePages_Total:     256
-        HugePages_Free:      256
+        ShmemHugePages:        0 kB
+        HugePages_Total:    1024
+        HugePages_Free:     1024
         HugePages_Rsvd:        0
         HugePages_Surp:        0
         Hugepagesize:       2048 kB
         $ mount | grep huge
-        nodev on /mnt/huge type hugetlbfs (rw)
-        $
+        cgroup on /sys/fs/cgroup/hugetlb type cgroup (rw,nosuid,nodev,noexec,relatime,hugetlb)
+        hugetlbfs on /dev/hugepages type hugetlbfs (rw,relatime,pagesize=2M)
+        nodev on /mnt/huge type hugetlbfs (rw,relatime,pagesize=2M)
 
 NIC (Network Interface Card) assignment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------
 
-The following steps detatch the control and management of NICs, which will be used for DPDK application, from Linux kernel.
+The following steps detatch the control and management of NICs from Linux kernel and attach drivers used by DPDK application.
 
-In this example, the host has three NICs, we are going to use ``eth1``, ``eth2`` for Lagopus software swtich.
-Perform the following steps to enable NICs for DPDK application.
+In this example, the host has 4 NICs where we are going to use 3 oth them (``enp0s8``, ``enp0s9``, ``enp0s10``) for Lagopus software router.
 
-.. note::
+  .. note::
 
    * You need to unbound NIC from kernel (ixgbe driver) before using it with DPDK.
    * You will lose connection to the OS if you unbound NIC used for management plane (ex: ssh).
 
+* Confirm NIC you are planning to use for DPDK are NOT marked ``*Active*``.
+
+  .. code-block:: none
+
+   $ cd ~/dpdk-stable-17.11.1
+   ~/dpdk-stable-17.11.1$ ./usertools/dpdk-devbind.py -s
+   
+   Network devices using DPDK-compatible driver
+   ============================================
+   <none>
+   
+   Network devices using kernel driver
+   ===================================
+   0000:00:03.0 '82540EM Gigabit Ethernet Controller 100e' if=enp0s3 drv=e1000 unused= *Active*
+   0000:00:08.0 '82540EM Gigabit Ethernet Controller 100e' if=enp0s8 drv=e1000 unused=
+   0000:00:09.0 '82540EM Gigabit Ethernet Controller 100e' if=enp0s9 drv=e1000 unused=
+   0000:00:0a.0 '82540EM Gigabit Ethernet Controller 100e' if=enp0s10 drv=e1000 unused=
+
+* Load kernel modules
+* Disable NICs
+* Bind NICs to DPDK driver
+
+  .. code-block:: none
+
+   ~/dpdk-stable-17.11.1$ sudo -s
+   ~/dpdk-stable-17.11.1# modprobe uio
+   ~/dpdk-stable-17.11.1# insmod build/kmod/igb_uio.ko
+   ~/dpdk-stable-17.11.1# ip link set enp0s8 down
+   ~/dpdk-stable-17.11.1# ip link set enp0s9 down
+   ~/dpdk-stable-17.11.1# ip link set enp0s10 down
+   ~/dpdk-stable-17.11.1# ./usertools/dpdk-devbind.py --bind=igb_uio enp0s8 enp0s9 enp0s10
+
+* Confirm (only) NICs for DPDK are listed under "Network devices using DPDK-compatible driver"
+
+  .. code-block:: none
+
+   ~/dpdk-stable-17.11.1# ./usertools/dpdk-devbind.py -s
+   
+   Network devices using DPDK-compatible driver
+   ============================================
+   0000:00:08.0 '82540EM Gigabit Ethernet Controller 100e' drv=igb_uio unused=e1000
+   0000:00:09.0 '82540EM Gigabit Ethernet Controller 100e' drv=igb_uio unused=e1000
+   0000:00:0a.0 '82540EM Gigabit Ethernet Controller 100e' drv=igb_uio unused=e1000
+   
+   Network devices using kernel driver
+   ===================================
+   0000:00:03.0 '82540EM Gigabit Ethernet Controller 100e' if=enp0s3 drv=e1000 unused=igb_uio *Active*
+
+
+Next Steps
+----------
+
+Refer to :ref:`ref_installation` for steps to install Lagopus software router.
 
-
-* Check PCI ID of the NICs you want to use for DPDK with ``dpdk-devbind.py`` script.
-
-  ``dpdk-devbind.py`` script displays DPDK-enabled NIC information, such as PCI ID and interface name in Linux kernel.
-
-  .. code-block:: console
-
-     $ cd lagopus
-     $ sudo ./src/dpdk/tools/dpdk-devbind.py --status
-
-     Network devices using DPDK-compatible driver
-     ============================================
-     <none>
-
-     Network devices using kernel driver
-     ===================================
-     0000:00:03.0 '82540EM Gigabit Ethernet Controller' if=eth0 drv=e1000 unused= *Active*
-     0000:00:08.0 '82545EM Gigabit Ethernet Controller (Copper)' if=eth1 drv=e1000 unused=
-     0000:00:09.0 '82545EM Gigabit Ethernet Controller (Copper)' if=eth2 drv=e1000 unused=
-
-     Other network devices
-     =====================
-     <none>
-     $
-
-
-  In this example, You can see PCI IDs of ``eth1`` and ``eth2`` from the output, ``0000:00:08.0`` and ``0000:00:09.0``.
-
-  .. list-table:: NIC configuation before NIC unbound operation
-     :header-rows: 1
-
-     * - PCI ID
-       - Linux IF name
-       - Bounded by Linux
-     * - 0000:00:03.0
-       - eth0
-       - Yes
-     * - 0000:00:08.0
-       - eth1
-       - Yes
-     * - 0000:00:09.0
-       - eth2
-       - Yes
-
-
-* Unbound NICs from ixgbe driver and registerd with igb_uio driver.
-
-   Perform the dpdk-devbind with the PCI IDs to be unbounded from Linux kernel.
-
-   .. code-block:: console
-
-       ~/lagopus$ sudo ./src/dpdk/tools/dpdk-devbind.py --bind=igb_uio 0000:00:08.0 0000:00:09.0
-       ~/lagopus$ sudo ./src/dpdk/tools/dpdk-devbind.py --status
-
-       Network devices using DPDK-compatible driver
-       ============================================
-       0000:00:08.0 '82545EM Gigabit Ethernet Controller (Copper)' drv=igb_uio unused=
-       0000:00:09.0 '82545EM Gigabit Ethernet Controller (Copper)' drv=igb_uio unused=
-
-       Network devices using kernel driver
-       ===================================
-       0000:00:03.0 '82540EM Gigabit Ethernet Controller' if=eth0 drv=e1000 unused=igb_uio *Active*
-
-       Other network devices
-       =====================
-       <none>
-
-* Memorize the DPDK NIC configuration
-
-   After the unbound NICs from Linux kernel, the NIC which was bounded to ``eth1`` is accesssed by ``DPDK port #0`` or PCI ID (``0000:00:08.0``) directly. The NIC which was bounded by ``eth2`` is also accessed by ``DPDK port #1`` or PCI ID (``0000:00:09.0``).
-
-  .. list-table:: NIC configuation after NIC unbound operation
-     :header-rows: 1
-
-     * - PCI ID
-       - Linux IF name
-       - Bounded by Linux
-       - DPDK ready
-       - DPDK port #
-     * - 0000:00:03.0
-       - eth0
-       - Yes
-       - No
-       -
-     * - 0000:00:08.0
-       - eth1
-       - No
-       - Yes
-       - 0
-     * - 0000:00:09.0
-       - eth2
-       - No
-       - Yes
-       - 1
-
-Setup Lagopus configuration file
-----------------------------------------
-
-
-Example Lagopus configuration (DSL format) can be found at "misc/examples/lagopus.dsl".
-``lagopus.dsl`` file must be located at the same directory of the executable of ``lagopus``, or under ``/usr/local/etc/lagopus/``.
-
-* Copy sample configuration file under ``/usr/local/etc/lagopus/``.
-
-  .. code-block:: console
-
-     $ sudo mkdir /usr/local/etc/lagopus/
-     $ cd ~/lagopus-0.2.10
-     $ sudo cp misc/examples/lagopus.dsl /usr/local/etc/lagopus/lagopus.dsl
-
-* Edit configuration file suited to your environment.
-
-  * Example:
-
-    * One OpenFlow controller: "127.0.0.1"
-    * ``eth0``: management interface. (Thus does not appear in the configuration)
-    * ``DPDK port #0`` which was ``eth1`` and ``DPDK port #1`` which was ``eth2``: Lagopus dataplane ports. These two ports are accessed with DPDK.
-
-    .. code-block:: console
-
-       $ sudo vi /usr/local/etc/lagopus/lagopus.dsl
-       channel channel01 create -dst-addr 127.0.0.1 -protocol tcp
-       controller controller01 create -channel channel01 -role equal -connection-type main
-       interface interface01 create -type ethernet-dpdk-phy -port-number 0
-       interface interface02 create -type ethernet-dpdk-phy -port-number 1
-       port port01 create -interface interface01
-       port port02 create -interface interface02
-       bridge bridge01 create -controller controller01 -port port01 1 -port port02 2 -dpid 0x1
-       bridge bridge01 enable
-       $
-
-Running / Stopping Lagopus software router 
----------------------------------------------
-
-
-DPDK command option
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-In order to run Lagopus softwarwe switch with DPDK configuration, you need to specify DPDK-related options in ``lagopus`` command: which CPU cores are assigned to packet processing (``-c``), how many memory channels the host has (``-n``), which DPDK ports are used (``-p``).
-
-In this example, the host has four CPU cores and two memory channel and you try to assign CPU core #1 and CPU core #0 for network I/O and processing and DPDK port #0 and DPDK port #1.
-With ``-c`` option, you should specify which CPU cores are assigned to Lagopus software switch. The value of ``-c`` option uses the hexadecimal notation that its *N* -bit shows whehter CPU core # *N* is used or not for DPDK. The following table help your understanding of CPU flags.
-
-.. list-table:: DPDK CPU flag
-   :header-rows: 1
-
-   * - cpu core # 3
-     - cpu core # 2
-     - cpu core # 1
-     - cpu core # 0
-     - flag in binary
-     - flag in hexadecimal
-   * - 0
-     - 0
-     - 1
-     - 1
-     - 0x0011
-     - 0x3
-
-
-With ``-p`` option, you should specify which DPDK ports are assigned to Lagopus software switch. The value of ``-p`` option also uses the hexadecimal notation that its *N* -bit shows whehter DPDK port # *N* is used or not for DPDK.
-
-.. list-table:: DPDK NIC flag
-   :header-rows: 1
-
-   * - DPDK port # 1
-     - DPDK port # 2
-     - flag in binary
-     - flag in hexadecimal
-   * - 1
-     - 1
-     - 0x11
-     - 0x3
-
-
-
-Run Lagopus software switch
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* Peform the following command to run Lagopus software switch in foreground with debug mode.
-
-  .. code-block:: console
-
-     $ sudo lagopus -d -- -c3 -n2 -- -p3
-
-Or
-
-* Peform the following command to run Lagopus software switch in background.
-
-  .. code-block:: console
-
-     $ sudo lagopus -- -c3 -n2 -- -p3
-
-
-Operation of Lagopus software switch with ``lagosh``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* Enter ``show version`` command from lagosh to confirm it's running.
-* Enter ``stop`` command from lagosh to stop Lagopus vswitch.
-
-  .. code-block:: console
-
-     $ lagosh
-     Lagosh> show version
-     {
-         "product-name": "Lagopus",
-         "version": "0.2.10-release"
-     }
-     Lagosh> stop
-     Lagosh> show version
-     Socket connection refused.  Lagopus is not running?
-     Lagosh> exit
-     $
-
-.. note::
-
-   Lagopus software switch with DPDK use pooling-based packet processing. Therefore you will see lagopus consume 100% of CPUs by  ``top`` command.
-
-   .. code-block:: console
-
-      top - 15:50:26 up 6 min,  1 user,  load average: 0.34, 0.13, 0.07
-      Tasks:  83 total,   2 running,  81 sleeping,   0 stopped,   0 zombie
-      %Cpu0  :  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
-      %Cpu1  :100.0 us,  0.0 sy,  0.0 ni,  0.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
-      KiB Mem:   3081312 total,   686804 used,  2394508 free,    20676 buffers
-      KiB Swap:  3143676 total,        0 used,  3143676 free.    78792 cached Mem
-
-        PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
-       1205 root      20   0 1037728  16264   6764 S 100.2  0.5   0:25.58 lagopus

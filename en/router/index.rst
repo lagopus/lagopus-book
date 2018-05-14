@@ -1,6 +1,6 @@
 .. lagopus-book-router documentation master file, created by
    sphinx-quickstart on Mon Feb 29 22:51:10 2016.
-   updated by Kentaro Ebisawa on Mon May 07 2018.
+   Refer to GitHub commit logs for updates.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -15,4 +15,10 @@ Contents:
 
    preface.rst
    introduction.rst
+   architecture.rst
    installation-dpdk.rst
+   installation.rst
+   config-basic.rst
+   config-examples.rst
+   debug.rst
+   virtualbox.rst
