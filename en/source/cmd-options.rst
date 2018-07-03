@@ -127,12 +127,17 @@ These options are exclusive.
 **Automatic assignment option**
 """""""""""""""""""""""""""""""
 
-* ``-p PORTMASK`` : (Mandatory)
+* ``-p PORTMASK`` :
 
   * hexadecimal bitmask of ports to be used
   * Example: ``-p3``
 
-	* Use port 0 and port 1
+    * Use port 0 and port 1
+
+  * Since Lagpous v0.2.8, this option has become optional when any port is specified in ``lagopus.dsl``.
+
+    * Only specified ports in ``lagopus.dsl`` are used.
+
 
 * ``-w NWORKERS``:
 
