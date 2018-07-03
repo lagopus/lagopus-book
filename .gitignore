@@ -1,4 +1,6 @@
 */build/
+*/build-router/
+*/build-switch/
 *.pyc
 */source/images/*/*.eps
 # */source/images/*/*.png
